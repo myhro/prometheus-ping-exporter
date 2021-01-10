@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/go-ping/ping"
@@ -21,7 +22,11 @@ func checkLoss(packetLoss prometheus.Gauge, target string) {
 			continue
 		}
 
+		if runtime.GOOS == "linux" {
+			pinger.SetPrivileged(true)
+		}
 		pinger.Timeout = time.Second
+
 		err = pinger.Run()
 		if err != nil {
 			log.Print("pinger.Run error: ", err)
